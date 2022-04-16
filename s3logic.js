@@ -327,3 +327,35 @@ export  function linktoid(link) {
     
 }
 
+export async function Deleteobjects(signintoken,oid,Bucket) {
+    
+    const s3 = new S3Client({
+        region: region,
+        credentials: fromCognitoIdentityPool({
+            client: new CognitoIdentityClient({ region: region }),
+            identityPoolId: identitypoolid,
+            logins: {
+                "cognito-idp.us-east-1.amazonaws.com/us-east-1_nASW5MZW5": signintoken,
+            },
+        }),
+    });
+    var success=true;
+    for (let i = 0; i < oid.length; i++)
+    {
+        const Params = {
+            Bucket: Bucket,
+            Key: oid[0]
+        };
+        try {
+            const data = await s3.send(new DeleteObjectCommand(Params));
+            console.log("Success", data);
+        } catch (err) {
+            console.log("Error", err);
+            success=false;
+        }
+
+    }
+    
+    return success;
+}
+
